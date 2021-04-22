@@ -6,6 +6,7 @@ RUN yum check-update; \
     yum install -y sshpass; \
     yum install -y nano; \
     pip3 install --upgrade pip; \
+    pip3 install ansible; \
     pip3 install ansible[azure]; \
     ansible-galaxy collection install azure.azcollection; \
     yum install -y wget; \
