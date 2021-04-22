@@ -1,1 +1,2 @@
+# Ignore environment variables for dev/test
 .env
