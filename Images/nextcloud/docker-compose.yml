@@ -1,0 +1,52 @@
+version: '3.7'
+
+networks:
+  nextcloud:
+
+services:
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    networks:
+      - nextcloud
+    ports:
+      - 8090:80
+      - 443:443
+    volumes:
+      - ${NEXTCLOUD_ROOT}/html:/var/www/html
+      - ${NEXTCLOUD_ROOT}/data:/srv/nextcloud/data
+    extra_hosts:
+      - "${NEXTCLOUD_FQDN}:${NEXTCLOUD_IPADDRESS}"
+    depends_on:
+      - mariadb
+      - redis
+    environment:
+      - NEXTCLOUD_TRUSTED_DOMAINS='${NEXTCLOUD_FQDN}'
+      - NEXTCLOUD_DATA_DIR=/srv/nextcloud/data
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=nextcloud-mariadb
+      - REDIS_HOST=nextcloud-redis
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb
+    container_name: nextcloud-mariadb
+    restart: unless-stopped
+    volumes:
+      - ${NEXTCLOUD_ROOT}/mariadb:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    networks:
+      - nextcloud
+
+  redis:
+    image: redis
+    container_name: nextcloud-redis
+    networks:
+      - nextcloud
+    restart: unless-stopped    
